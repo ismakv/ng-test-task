@@ -1,0 +1,43 @@
+<h2>User List</h2>
+
+<section class="action-bar">
+    <form [formGroup]="searchForm">
+        <input type="text" formControlName="search" placeholder="Search">
+    </form>  
+    <button class="switch-view" (click)="toggleView()">
+        Switch View
+    </button>
+</section>
+
+
+<div *ngIf="isLoading$ | async">
+  Loading...
+</div>
+
+<div *ngIf="(userList$ | async) as userList" [ngClass]="{'card-container': viewType === 'card', 'row-container': viewType === 'row'}">
+  <div *ngFor="let user of userList.items">
+    <div *ngIf="viewType === 'card'; else rowView" class="user-card">
+      <h3>{{ user.user_name }}</h3>
+      <button (click)="deleteUser(user.id)">Delete</button>
+    </div>
+    <ng-template #rowView>
+      <div class="user-row">
+        <span>{{ user.user_name }}</span>
+        <button (click)="deleteUser(user.id)">Delete</button>
+      </div>
+    </ng-template>
+  </div>
+</div>
+
+<div class="page-container">
+    <button class="page-container-item" [ngClass]="{'active': (this.currentPage | async) === page}" *ngFor="let page of (pages$ | async)" (click)="onPageChange(page)">
+        {{ page }}
+    </button>
+</div>
+
+<form [formGroup]="paginationForm">
+    <label>Items per page:</label>
+    <select formControlName="itemsPerPage" (change)="onPageSizeChange()">
+      <option *ngFor="let option of pageSizeOptions" [value]="option">{{ option }}</option>
+    </select>
+</form>
